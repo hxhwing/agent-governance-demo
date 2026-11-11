@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Google Cloud Agent Governance — Game LiveOps Workbench</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/styles.css?v=20261111r3" />
+</head>
+<body>
+  <!-- Top Command Header -->
+  <header class="top-header">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <path d="m9 12 2 2 4-4"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h1>Google Cloud Agent Security &amp; Governance</h1>
+        <p class="subtitle">
+          <span>游戏客服与运营治理工作台</span>
+          <span class="sep" aria-hidden="true">/</span>
+          <span id="meta-model" class="mono-meta">gemini-3.8-flash (global)</span>
+          <span class="sep" aria-hidden="true">/</span>
+          <span>Runtime <code id="engine-id">加载中...</code></span>
+          <span class="hidden" id="meta-project"></span>
+          <span class="hidden" id="meta-region">us-central1</span>
+        </p>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <div class="inspector-nav" role="navigation" aria-label="治理策略检查器">
+        <button class="nav-pill" id="nav-btn-registry" onclick="openInspector('registry')">
+          <span class="nav-dot dot-slate"></span>Identity &amp; Registry
+        </button>
+        <button class="nav-pill" id="nav-btn-ma" onclick="openInspector('ma')">
+          <span class="nav-dot dot-amber"></span>Model Armor
+        </button>
+        <button class="nav-pill" id="nav-btn-uap" onclick="openInspector('uap')">
+          <span class="nav-dot dot-cobalt"></span>IAM UAP
+        </button>
+        <button class="nav-pill" id="nav-btn-sgp" onclick="openInspector('sgp')">
+          <span class="nav-dot dot-violet"></span>SGP 语义策略
+        </button>
+      </div>
+
+      <div class="header-divider" aria-hidden="true"></div>
+
+      <button class="icon-btn" onclick="toggleTheme()" id="theme-toggle-btn" title="切换浅色/深色外观" aria-label="切换浅色或深色外观">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="4"/>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+        </svg>
+      </button>
+      <button class="btn-secondary" onclick="startNewSession()" title="创建新的 Agent Engine 多轮会话">新会话</button>
+    </div>
+  </header>
+
+  <!-- Non-Disruptive Overlay Backdrop for Inspector Sheets -->
+  <div class="inspector-backdrop hidden" id="inspector-backdrop" onclick="closeAllDrawers()"></div>
+
+  <!-- Sheet 1: Agent Identity & Agent Registry -->
+  <section class="inspector-sheet hidden" id="registry-drawer" aria-label="Identity 与 Registry 检查器">
+    <div class="drawer-header">
+      <div>
+        <h3 class="drawer-title">身份与资产注册：Agent Identity + Agent Registry</h3>
+        <div class="drawer-sub">零信任基座：为 Agent 签发不可伪造的 SPIFFE 工作负载身份，统一登记合法的 Agent、MCP 服务与外部备案域名</div>
+      </div>
+      <div class="drawer-actions">
+        <button class="btn-chip" onclick="loadTopology()">刷新资产</button>
+        <button class="btn-chip" onclick="closeAllDrawers()">收起 Esc</button>
+      </div>
+    </div>
+    <div class="drawer-body">
+      <div class="identity-card">
+        <span class="identity-label">SPIFFE 工作负载身份凭证</span>
+        <code id="spiffe-id">加载中...</code>
+      </div>
+      <div class="drawer-grid">
+        <div class="registry-section">
+          <h4>已注册 Agents (<span id="count-agents">0</span>)</h4>
+          <div id="registry-agents-list" class="asset-list">加载中...</div>
+        </div>
+        <div class="registry-section">
+          <h4>已注册 MCP 服务 (<span id="count-mcps">0</span>)</h4>
+          <div id="registry-mcp-list" class="asset-list">加载中...</div>
+        </div>
+        <div class="registry-section">
+          <h4>已注册外部域名 (<span id="count-eps">0</span>)</h4>
+          <div id="registry-endpoints-list" class="asset-list">加载中...</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sheet 2: Model Armor -->
+  <section class="inspector-sheet ma-sheet hidden" id="ma-drawer" aria-label="Model Armor 检查器">
+    <div class="drawer-header">
+      <div>
+        <h3 class="drawer-title">内容与隐私安全：Model Armor</h3>
+        <div class="drawer-sub">双向挂载于入向与出向 Agent Gateway (<code>CONTENT_AUTHZ</code>) · 拦截越狱攻击、钓鱼链接与未脱敏敏感隐私</div>
+      </div>
+      <div class="drawer-actions">
+        <span class="tag-neutral mono-meta">Template: agent-gov-ma-template</span>
+        <button class="btn-chip" onclick="closeAllDrawers()">收起 Esc</button>
+      </div>
+    </div>
+    <div class="drawer-body">
+      <div class="clean-cards-row">
+        <div class="clean-info-card">
+          <div class="cic-tag">入向网关拦截 (Client ➔ Agent)</div>
+          <div class="cic-title">防越狱与提示词注入 (PI / Jailbreak)</div>
+          <div class="cic-desc">识别 GOD MODE、忽略系统指令等提权攻击，在网关边缘直接返回 <code>HTTP 403</code>，流量不进入 Agent。</div>
+        </div>
+        <div class="clean-info-card">
+          <div class="cic-tag">出向网关拦截 (Agent ➔ Model / Client)</div>
+          <div class="cic-title">敏感隐私防泄漏 (SDP PII Filter)</div>
+          <div class="cic-desc">实时扫描响应中的美国社会安全号 (<code>US_SSN</code>) 与银行卡号，返回 <code>HTTP 403</code> 阻断隐私回传。</div>
+        </div>
+        <div class="clean-info-card">
+          <div class="cic-tag">内容合规与高危链接</div>
+          <div class="cic-title">RAI 有害内容与恶意钓鱼 URL 过滤</div>
+          <div class="cic-desc">识别钓鱼站点与危险内容 (<code>LOW_AND_ABOVE</code>)，防止客服点击恶意外部申诉链接。</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sheet 3: IAM UAP & IAP -->
+  <section class="inspector-sheet uap-sheet hidden" id="uap-drawer" aria-label="IAM UAP 检查器">
+    <div class="drawer-header">
+      <div>
+        <h3 class="drawer-title">零信任访问权限控制：IAM UAP + Cloud IAP</h3>
+        <div class="drawer-sub">纯白名单模型 (Default-Deny)：即使 MCP 全量工具已导入 Registry，仅显式列入 Allow Tool List 的工具允许调用，其余默认返回 <code>HTTP 403</code></div>
+      </div>
+      <div class="drawer-actions">
+        <span class="tag-neutral mono-meta">IAP V2 · Enforced</span>
+        <button class="btn-chip" onclick="toggleDrawerJson('uap-json-wrap')">查看 GCP JSON 源码</button>
+        <button class="btn-chip" onclick="closeAllDrawers()">收起 Esc</button>
+      </div>
+    </div>
+    <div class="drawer-body">
+      <div class="logic-flow-bar">
+        <div class="lf-step"><span class="step-idx">01</span><strong>liveops-egress-gw</strong> 劫持全部出向流量</div>
+        <span class="lf-arrow" aria-hidden="true">→</span>
+        <div class="lf-step"><span class="step-idx">02</span><strong>Cloud IAP (PEP)</strong> 提取 SPIFFE 身份与目标资产</div>
+        <span class="lf-arrow" aria-hidden="true">→</span>
+        <div class="lf-step"><span class="step-idx">03</span><strong>IAM UAP (PDP)</strong> 评估 <code>egressViaIAP</code> 与 CEL 白名单</div>
+      </div>
+
+      <div class="uap-clean-grid">
+        <div class="uap-mini-card">
+          <div class="umc-head"><span>Agent ➔ Model</span><span class="tag-neutral">Endpoint 白名单</span></div>
+          <div class="umc-rule"><code>endpoint.name == '.../essential-gcp-apis'</code></div>
+          <div class="umc-out"><span class="dot-inline allow"></span>允许 Gemini 3.8 Flash</div>
+        </div>
+        <div class="uap-mini-card">
+          <div class="umc-head"><span>Agent ➔ MCP 工具</span><span class="tag-neutral">Allow Tool List</span></div>
+          <div class="umc-rule"><code>tool.name in ['query_ticket', 'grant_comp']</code></div>
+          <div class="umc-out"><span class="dot-inline allow"></span>查单/发奖 &nbsp;·&nbsp; <span class="dot-inline block"></span>封号默认拒 (403)</div>
+        </div>
+        <div class="uap-mini-card">
+          <div class="umc-head"><span>Agent ➔ A2A 专员</span><span class="tag-neutral">Agent 白名单</span></div>
+          <div class="umc-rule"><code>agent.name == '.../sre-incident'</code></div>
+          <div class="umc-out"><span class="dot-inline allow"></span>SRE 排障 &nbsp;·&nbsp; <span class="dot-inline block"></span>财务退费默认拒 (403)</div>
+        </div>
+        <div class="uap-mini-card">
+          <div class="umc-head"><span>Agent ➔ 外部域名</span><span class="tag-neutral">防数据外发</span></div>
+          <div class="umc-rule"><code>endpoint.name == '.../discord-community-webhook'</code></div>
+          <div class="umc-out"><span class="dot-inline allow"></span>Discord 公告 &nbsp;·&nbsp; <span class="dot-inline block"></span>未备案外发 (403)</div>
+        </div>
+      </div>
+
+      <div id="uap-json-wrap" class="hidden">
+        <pre id="uap-live-json-view" class="sgp-json-code">加载 IAM UAP 策略源码...</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sheet 4: SGP (Semantic Governance Policy) -->
+  <section class="inspector-sheet sgp-sheet hidden" id="sgp-drawer" aria-label="SGP 语义治理策略配置">
+    <div class="drawer-header">
+      <div>
+        <h3 class="drawer-title">业务语义与用户意图治理：Semantic Governance Policy (SGP)</h3>
+        <div class="drawer-sub">绑定粒度：<code>Agent</code> 全局或指定单个 <code>MCP Tool</code> · 在具备工具权限后，对参数阈值、准入事由与用户意图进行实时语义裁决</div>
+      </div>
+      <div class="drawer-actions">
+        <span id="sgp-save-status" class="sgp-status-msg"></span>
+        <button class="btn-chip" onclick="toggleDrawerJson('sgp-json-wrap')">查看 GCP JSON 源码</button>
+        <button class="btn-chip btn-reset-sgp" onclick="resetSgpPolicy()">恢复默认基线</button>
+        <button class="btn-chip" onclick="closeAllDrawers()">收起 Esc</button>
+      </div>
+    </div>
+    <div class="drawer-body">
+      <div class="sgp-presets-bar">
+        <button class="sgp-preset-card" id="preset-default" onclick="applySgpPreset('default')">
+          <span class="preset-badge">标准合规基线：≤500 金币 · 仅限服务端故障</span>
+          <span class="preset-desc">≤500 客观故障自动放行 · ≥501 超额转人工审批 · 非故障自主消费拒赔</span>
+        </button>
+        <button class="sgp-preset-card" id="preset-strict" onclick="applySgpPreset('strict')">
+          <span class="preset-badge">一级风控收紧：仅限全服级停机事故</span>
+          <span class="preset-desc">版本结算窗口暂停单点网络抖动自动赔付，所有单用户申诉均转人工队列</span>
+        </button>
+        <button class="sgp-preset-card" id="preset-vip" onclick="applySgpPreset('vip')">
+          <span class="preset-badge">高价值账户豁免：上限上调至 ≤2000 金币</span>
+          <span class="preset-desc">单笔自动阈值放宽至 2000 金币，允许高价值账户首次客户端错兑豁免赔付</span>
+        </button>
+      </div>
+
+      <div id="sgp-rules-list" class="sgp-rule-cards-container">加载中...</div>
+
+      <div class="sgp-quick-add-row">
+        <select id="sgp-new-rule-tool" class="form-select" style="width:210px;">
+          <option value="grant_player_compensation">grant_player_compensation</option>
+          <option value="query_player_ticket">query_player_ticket</option>
+        </select>
+        <input type="text" id="sgp-new-rule-text" class="form-input" style="flex:1;" placeholder="输入自然语言约束规则，或点击右侧快捷模板..." />
+        <button class="btn-chip" onclick="fillRuleTemplate('grant_player_compensation', '冻结账号 Player_Ace 的补偿权限，严禁向其发放任何金币。')">模板：禁发 Player_Ace</button>
+        <button class="btn-chip" onclick="fillRuleTemplate('query_player_ticket', '禁止查询工单 TICKET-1001。')">模板：禁查 1001</button>
+        <button class="btn-chip btn-add-rule" onclick="addCustomSgpRule()">新增规则</button>
+      </div>
+
+      <div id="sgp-json-wrap" class="hidden">
+        <pre id="sgp-live-json-view" class="sgp-json-code">加载中...</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main 3-Column Telemetry Workspace -->
+  <main class="dashboard-grid" id="dashboard-grid">
+    <!-- Collapsed Left Sidebar Rail -->
+    <div class="left-collapsed-rail hidden" id="left-collapsed-rail" onclick="toggleLeftSidebar()" title="展开演示场景面板">
+      <span class="rail-icon" aria-hidden="true">›</span>
+      <span class="rail-text">演示场景 (14)</span>
+    </div>
+
+    <!-- Left Column: Scenario Browser -->
+    <section class="panel left-panel" id="left-panel">
+      <div class="panel-header">
+        <div class="panel-title-row">
+          <h2>演示场景</h2>
+          <div class="panel-header-tools">
+            <button class="btn-chip" onclick="toggleAllCategories()" id="btn-toggle-cats">展开分类</button>
+            <button class="btn-chip" onclick="toggleLeftSidebar()" title="收起侧栏" aria-label="收起侧栏">‹</button>
+          </div>
+        </div>
+        <div class="scenario-filter-tabs" role="tablist" aria-label="按预期裁决筛选场景">
+          <button class="filter-tab active" data-filter="all" onclick="setScenarioFilter('all')">全部 <span>14</span></button>
+          <button class="filter-tab" data-filter="allow" onclick="setScenarioFilter('allow')"><i class="dot-inline allow"></i>放行 <span>5</span></button>
+          <button class="filter-tab" data-filter="block" onclick="setScenarioFilter('block')"><i class="dot-inline block"></i>拦截 <span>9</span></button>
+        </div>
+      </div>
+
+      <div class="playbook-categories" id="playbook-categories"></div>
+    </section>
+
+    <!-- Center Column: Real-Time Protocol & Conversation Stream -->
+    <section class="panel center-panel">
+      <div class="verdict-header">
+        <div class="verdict-top-row">
+          <div class="verdict-header-left">
+            <h2 class="verdict-title">实时交互与协议流</h2>
+            <span class="session-pill" id="active-session-pill" title="当前多轮对话共享同一个 Agent Engine Session">Session 初始化中</span>
+          </div>
+          <span class="verdict-badge neutral" id="verdict-badge">就绪</span>
+        </div>
+        <div class="verdict-meta" id="verdict-meta">就绪 · 支持多轮上下文</div>
+      </div>
+
+      <div class="chat-timeline" id="chat-timeline">
+        <div class="story-guide">
+          <div class="sg-header">Google Cloud Agent Governance 三层零信任架构</div>
+          <div class="sg-steps">
+            <div class="sg-card" onclick="openInspector('registry')">
+              <div class="sg-step-num">01 / 基座层</div>
+              <div class="sg-step-title">Identity + Registry</div>
+              <div class="sg-step-desc">签发不可伪造的 SPIFFE 身份，集中登记 Agent、MCP 与备案域名</div>
+            </div>
+            <div class="sg-card" onclick="openInspector('uap')">
+              <div class="sg-step-num">02 / 网关层</div>
+              <div class="sg-step-title">Ingress + Egress Gateway</div>
+              <div class="sg-step-desc">PSC 透明劫持入向与出向四路流量，物理防绕过</div>
+            </div>
+            <div class="sg-card" onclick="openInspector('sgp')">
+              <div class="sg-step-num">03 / 策略层</div>
+              <div class="sg-step-title">内容 · 权限 · 语义裁决</div>
+              <div class="sg-step-desc">Model Armor 审内容 · IAM UAP 控工具白名单 · SGP 审业务意图</div>
+            </div>
+          </div>
+          <div class="sg-hint">点击左侧场景可将测试指令填入下方输入框，核对后按 Enter 或点击「发送」执行</div>
+        </div>
+      </div>
+
+      <div class="prompt-composer">
+        <div class="staged-bar hidden" id="staged-scenario-bar">
+          <div class="staged-bar-info">
+            <span class="staged-label">已载入场景</span>
+            <strong id="staged-scenario-title"></strong>
+            <span id="staged-scenario-expect"></span>
+          </div>
+          <button class="staged-clear-btn" onclick="clearStagedPrompt()" title="清空输入框">清空 ×</button>
+        </div>
+        <div class="composer-row">
+          <textarea id="custom-prompt" rows="2" placeholder="点击左侧场景填入测试指令，或直接输入中文问题（Enter 发送，Shift + Enter 换行）..."></textarea>
+          <button id="run-btn" class="btn-execute" onclick="executeCurrentPrompt()">
+            <span class="btn-spinner hidden" id="run-btn-spinner" aria-hidden="true"></span>
+            <span id="run-btn-label">发送</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right Column: Live Governance Signal Circuit -->
+    <section class="panel right-panel">
+      <div class="panel-header">
+        <div class="panel-title-row">
+          <h2>治理拓扑与实时信号路径</h2>
+          <span class="topo-status-label" id="topo-foot-status">空闲待命</span>
+        </div>
+      </div>
+
+      <div class="topology-diagram" id="topology-diagram">
+        <!-- Foundation Strip -->
+        <button type="button" class="foundation-bar" onclick="openInspector('registry')" title="查看 SPIFFE Identity 与 Agent Registry 资产">
+          <span class="foundation-tag">零信任基座</span>
+          <span class="foundation-label">SPIFFE Identity · Agent Registry</span>
+          <span class="inspect-arrow" aria-hidden="true">↗</span>
+        </button>
+
+        <!-- Client Node -->
+        <div class="topo-node client-node" id="node-client">
+          <div class="node-head">
+            <span class="node-indicator"></span>
+            <span class="node-title">调用入口 (Web 控制台 / Gemini Enterprise)</span>
+          </div>
+        </div>
+
+        <div class="topo-connector" id="arrow-ingress">
+          <span class="conn-line"></span>
+          <span class="conn-tag">CLIENT_TO_AGENT · :streamQuery</span>
+        </div>
+
+        <!-- Ingress Gateway -->
+        <div class="topo-node gw-node clickable-node" id="node-ingress-gw" onclick="openInspector('ma')">
+          <div class="node-head">
+            <span class="node-indicator"></span>
+            <span class="node-title">入向网关 <code>ingress-gw</code></span>
+            <span class="inspect-arrow" aria-hidden="true">↗</span>
+          </div>
+          <div class="node-badges">
+            <span class="mini-badge ma-topo-badge" id="badge-ingress-ma" onclick="event.stopPropagation(); openInspector('ma')">
+              <span>Model Armor</span>
+              <span class="badge-role">入口防越狱与恶意链接</span>
+            </span>
+          </div>
+        </div>
+
+        <div class="topo-connector compact" id="arrow-runtime">
+          <span class="conn-line"></span>
+        </div>
+
+        <!-- Agent Runtime -->
+        <div class="topo-node runtime-node clickable-node" id="node-runtime" onclick="openInspector('registry')">
+          <div class="node-head">
+            <span class="node-indicator"></span>
+            <span class="node-title">主控运行时 <code>game-liveops-orchestrator</code></span>
+            <span class="inspect-arrow" aria-hidden="true">↗</span>
+          </div>
+        </div>
+
+        <div class="topo-connector" id="arrow-egress">
+          <span class="conn-line"></span>
+          <span class="conn-tag">AGENT_TO_ANYWHERE · PSC + SPIFFE mTLS</span>
+        </div>
+
+        <!-- Egress Gateway -->
+        <div class="topo-node gw-node" id="node-egress-gw">
+          <div class="node-head">
+            <span class="node-indicator"></span>
+            <span class="node-title">出向网关 <code>liveops-egress-gw</code></span>
+          </div>
+          <div class="node-badges">
+            <span class="mini-badge ma-topo-badge" id="badge-egress-ma" onclick="event.stopPropagation(); openInspector('ma')">
+              <span>Model Armor</span>
+              <span class="badge-role">出口防敏感隐私外泄 ↗</span>
+            </span>
+            <span class="mini-badge uap-topo-badge" id="badge-egress-iap" onclick="event.stopPropagation(); openInspector('uap')">
+              <span>IAM UAP + IAP</span>
+              <span class="badge-role">工具与资产白名单 ↗</span>
+            </span>
+            <span class="mini-badge sgp-topo-badge" id="badge-egress-sgp" onclick="event.stopPropagation(); openInspector('sgp')">
+              <span>SGP 语义治理</span>
+              <span class="badge-role">参数合规与意图对齐 ↗</span>
+            </span>
+          </div>
+        </div>
+
+        <div class="topo-branch-bus" aria-hidden="true"></div>
+
+        <!-- 4 Downstream Targets -->
+        <div class="topo-targets-grid">
+          <div class="topo-target" id="target-model">
+            <div class="t-title">Model</div>
+            <div class="t-sub">Gemini 3.8 Flash</div>
+          </div>
+          <div class="topo-target" id="target-mcp">
+            <div class="t-title">MCP 工具</div>
+            <div class="t-sub">查单 · 发奖 · 封号</div>
+          </div>
+          <div class="topo-target" id="target-a2a">
+            <div class="t-title">A2A 专员</div>
+            <div class="t-sub">SRE 排障 · 财务退费</div>
+          </div>
+          <div class="topo-target" id="target-endpoint">
+            <div class="t-title">外部域名</div>
+            <div class="t-sub">Discord · 外发拦截</div>
+          </div>
+        </div>
+
+        <!-- Signal Legend -->
+        <div class="topo-legend">
+          <span><i class="dot-inline neutral"></i>未经过</span>
+          <span><i class="dot-inline allow"></i>放行通过</span>
+          <span><i class="dot-inline block"></i>策略阻断 (403)</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="/static/app.js?v=20261111r3"></script>
+</body>
+</html>

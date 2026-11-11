@@ -1,0 +1,33 @@
+# Local environment configuration & secrets (NEVER commit)
+.env
+.env.*
+!.env.example
+*credentials*.json
+*service-account*.json
+*.pem
+*.key
+
+# Python virtual environments & bytecode caches
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+
+# Generated runtime / temporary artifacts
+services/cloudrun_mcp_and_a2a/specs/
+*.log
+*.tmp
+*.bak
+
+# macOS / Windows / IDE files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

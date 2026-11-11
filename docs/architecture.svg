@@ -1,0 +1,392 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 790" width="100%" role="img" aria-label="Google Cloud Agent Security and Governance Architecture">
+  <defs>
+    <!-- Subtle Blueprint Dot Pattern -->
+    <pattern id="dotGrid" width="20" height="20" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1" fill="#dce4f0" />
+    </pattern>
+
+    <!-- Arrowheads -->
+    <marker id="arrowData" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" fill="#0b57d0" />
+    </marker>
+    <marker id="arrowControl" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" fill="#64748b" />
+    </marker>
+    <marker id="arrowAmber" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" fill="#b45309" />
+    </marker>
+    <marker id="arrowViolet" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" fill="#6d28d9" />
+    </marker>
+
+    <style>
+      .f-sans { font-family: -apple-system, BlinkMacSystemFont, "Plus Jakarta Sans", "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif; }
+      .f-mono { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+      .title-main { font-size: 17px; font-weight: 800; fill: #0f172a; }
+      .title-sub { font-size: 12px; font-weight: 500; fill: #475569; }
+      .zone-label { font-size: 11px; font-weight: 700; letter-spacing: 0.02em; }
+      .card-title { font-size: 13px; font-weight: 800; fill: #0f172a; }
+      .card-code { font-size: 11px; font-weight: 600; fill: #0b57d0; }
+      .card-desc { font-size: 11px; font-weight: 500; fill: #475569; }
+      .edge-pill { font-size: 10px; font-weight: 600; fill: #334155; }
+      .badge-text { font-size: 10px; font-weight: 700; }
+    </style>
+  </defs>
+
+  <!-- Outer Self-Contained Blueprint Canvas -->
+  <rect x="1" y="1" width="1278" height="788" rx="14" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" />
+  <rect x="2" y="68" width="1276" height="718" rx="12" fill="url(#dotGrid)" />
+
+  <!-- =======================================================================
+       HEADER BAR (y = 0..68)
+       ======================================================================= -->
+  <rect x="1.5" y="1.5" width="1277" height="66" rx="13" fill="#ffffff" />
+  <line x1="1" y1="68" x2="1279" y2="68" stroke="#e2e8f0" stroke-width="1.5" />
+
+  <!-- Shield Emblem -->
+  <rect x="28" y="17" width="34" height="34" rx="8" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.2" />
+  <path d="M45 23 L53 26.5 V33.5 C53 39 49.5 43.2 45 45 C40.5 43.2 37 39 37 33.5 V26.5 Z" fill="none" stroke="#0b57d0" stroke-width="1.8" />
+  <path d="M42 34 L44.2 36.2 L48.5 31.8" fill="none" stroke="#0b57d0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+
+  <text x="74" y="32" class="f-sans title-main">Google Cloud Agent Security &amp; Governance — 云端全景部署与治理拓扑</text>
+  <text x="74" y="51" class="f-sans title-sub">双向托管 Agent Gateway · SPIFFE 工作负载零信任身份 · MCP 工具级白名单与 SGP 业务语义裁决</text>
+
+  <!-- Legend (Right Header) -->
+  <g transform="translate(766, 23)">
+    <line x1="0" y1="11" x2="26" y2="11" stroke="#0b57d0" stroke-width="2" marker-end="url(#arrowData)" />
+    <text x="33" y="15" class="f-sans card-desc">数据面流量</text>
+
+    <line x1="108" y1="11" x2="134" y2="11" stroke="#64748b" stroke-width="1.6" stroke-dasharray="4 3" marker-end="url(#arrowControl)" />
+    <text x="141" y="15" class="f-sans card-desc">控制面策略与发现</text>
+
+    <rect x="252" y="1" width="104" height="21" rx="5" fill="#ecfdf5" stroke="#6ee7b7" />
+    <circle cx="264" cy="11.5" r="3.5" fill="#047857" />
+    <text x="273" y="15" class="f-sans badge-text" fill="#047857">ALLOW 放行</text>
+
+    <rect x="366" y="1" width="118" height="21" rx="5" fill="#fef2f2" stroke="#fca5a5" />
+    <circle cx="378" cy="11.5" r="3.5" fill="#b91c1c" />
+    <text x="387" y="15" class="f-sans badge-text" fill="#b91c1c">HTTP 403 阻断</text>
+  </g>
+
+  <!-- =======================================================================
+       TIER 1: GOVERNANCE CONTROL PLANE (y = 84..228)
+       ======================================================================= -->
+  <rect x="28" y="84" width="1224" height="144" rx="12" fill="#ffffff" fill-opacity="0.94" stroke="#cbd5e1" stroke-width="1.4" stroke-dasharray="6 4" />
+  <rect x="44" y="74" width="268" height="20" rx="5" fill="#eff6ff" stroke="#bfdbfe" />
+  <text x="56" y="88" class="f-sans zone-label" fill="#0b57d0">安全与治理控制平面 · Governance Control Plane</text>
+
+  <!-- CP Card 1: Model Armor (x = 48..330) -->
+  <g>
+    <rect x="48" y="120" width="282" height="92" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2" />
+    <rect x="48" y="120" width="282" height="4" rx="2" fill="#b45309" />
+    <text x="62" y="143" class="f-sans card-title">Model Armor</text>
+    <rect x="236" y="130" width="80" height="17" rx="4" fill="#fffbeb" stroke="#fde68a" />
+    <text x="276" y="142" text-anchor="middle" class="f-mono badge-text" fill="#b45309">us-central1</text>
+    <text x="62" y="162" class="f-mono card-code" fill="#b45309">agent-gov-ma-template</text>
+    <text x="62" y="182" class="f-sans card-desc">双向扫描 · 入向防越狱与恶意钓鱼链接</text>
+    <text x="62" y="198" class="f-sans card-desc">出向 SDP 阻断未脱敏隐私 (US_SSN)</text>
+  </g>
+
+  <!-- CP Card 2: Agent Registry (x = 348..630) -->
+  <g>
+    <rect x="348" y="120" width="282" height="92" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2" />
+    <rect x="348" y="120" width="282" height="4" rx="2" fill="#0b57d0" />
+    <text x="362" y="143" class="f-sans card-title">Agent Registry</text>
+    <rect x="536" y="130" width="80" height="17" rx="4" fill="#eff6ff" stroke="#bfdbfe" />
+    <text x="576" y="142" text-anchor="middle" class="f-mono badge-text" fill="#0b57d0">us-central1</text>
+    <text x="362" y="162" class="f-mono card-code">Agents · MCP · Endpoints · Skills</text>
+    <text x="362" y="182" class="f-sans card-desc">集中登记 3 Agents、1 MCP (全量 3 Tools)</text>
+    <text x="362" y="198" class="f-sans card-desc">与 2 外部备案域名，支持运行期动态发现</text>
+  </g>
+
+  <!-- CP Card 3: Cloud IAP + IAM UAP (x = 648..930) -->
+  <g>
+    <rect x="648" y="120" width="282" height="92" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2" />
+    <rect x="648" y="120" width="282" height="4" rx="2" fill="#0b57d0" />
+    <text x="662" y="143" class="f-sans card-title">Cloud IAP + IAM v3beta UAP</text>
+    <rect x="868" y="130" width="48" height="17" rx="4" fill="#eff6ff" stroke="#bfdbfe" />
+    <text x="892" y="142" text-anchor="middle" class="f-mono badge-text" fill="#0b57d0">global</text>
+    <text x="662" y="162" class="f-mono card-code">liveops-egress-uap-policy</text>
+    <text x="662" y="182" class="f-sans card-desc">纯白名单零信任授权 (Default-Deny)</text>
+    <text x="662" y="198" class="f-sans card-desc">CEL 精确管控至单个 MCP tool.name</text>
+  </g>
+
+  <!-- CP Card 4: Semantic Governance Policy (x = 948..1232) -->
+  <g>
+    <rect x="948" y="120" width="284" height="92" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2" />
+    <rect x="948" y="120" width="284" height="4" rx="2" fill="#6d28d9" />
+    <text x="962" y="143" class="f-sans card-title">Semantic Governance</text>
+    <rect x="1140" y="130" width="78" height="17" rx="4" fill="#f5f3ff" stroke="#ddd6fe" />
+    <text x="1179" y="142" text-anchor="middle" class="f-mono badge-text" fill="#6d28d9">us-central1</text>
+    <text x="962" y="162" class="f-mono card-code" fill="#6d28d9">liveops-compensation-cap-policy</text>
+    <text x="962" y="182" class="f-sans card-desc">自然语言红线：≤500 金币 · 仅赔服务端故障</text>
+    <text x="962" y="198" class="f-sans card-desc">用户意图对齐防工单间接注入 (tool_call)</text>
+  </g>
+
+  <!-- =======================================================================
+       ORTHOGONAL CONTROL-PLANE CALLOUT LINES (Zero Crossings!)
+       ======================================================================= -->
+  <!-- 1. Model Armor -> Ingress GW -->
+  <path d="M 250 212 L 250 248 L 365 248 L 365 278" fill="none" stroke="#b45309" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arrowAmber)" />
+  <rect x="262" y="239" width="88" height="17" rx="4" fill="#fffbeb" stroke="#fde68a" />
+  <text x="306" y="251" text-anchor="middle" class="f-mono badge-text" fill="#b45309">CONTENT_AUTHZ</text>
+
+  <!-- 2. Model Armor -> Egress GW (Top Internal Channel, Zero Crossing) -->
+  <path d="M 189 120 L 189 104 L 1242 104 L 1242 248 L 1212 248 L 1212 278" fill="none" stroke="#b45309" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arrowAmber)" />
+  <rect x="1166" y="239" width="82" height="17" rx="4" fill="#fffbeb" stroke="#fde68a" />
+  <text x="1207" y="251" text-anchor="middle" class="f-mono badge-text" fill="#b45309">出向内容扫描</text>
+
+  <!-- 3. Agent Registry -> Orchestrator Runtime -->
+  <path d="M 555 212 L 555 248 L 650 248 L 650 278" fill="none" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arrowControl)" />
+  <rect x="562" y="239" width="76" height="17" rx="4" fill="#ffffff" stroke="#cbd5e1" />
+  <text x="600" y="251" text-anchor="middle" class="f-sans edge-pill">动态资产发现</text>
+
+  <!-- 4. IAM UAP -> Egress GW -->
+  <path d="M 835 212 L 835 248 L 1010 248 L 1010 278" fill="none" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arrowControl)" />
+  <rect x="876" y="239" width="88" height="17" rx="4" fill="#ffffff" stroke="#cbd5e1" />
+  <text x="920" y="251" text-anchor="middle" class="f-mono edge-pill">REQUEST_AUTHZ</text>
+
+  <!-- 5. SGP -> Egress GW -->
+  <path d="M 1104 212 L 1104 278" fill="none" stroke="#6d28d9" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arrowViolet)" />
+  <rect x="1064" y="239" width="80" height="17" rx="4" fill="#f5f3ff" stroke="#ddd6fe" />
+  <text x="1104" y="251" text-anchor="middle" class="f-sans badge-text" fill="#6d28d9">SGP 意图裁决</text>
+
+  <!-- =======================================================================
+       TIER 2: CORE END-TO-END DATA PLANE PIPELINE (y = 282..486)
+       ======================================================================= -->
+
+  <!-- Stage 1: Clients (x = 28..224) -->
+  <rect x="28" y="282" width="196" height="204" rx="11" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1.4" />
+  <text x="42" y="303" class="f-sans zone-label" fill="#334155">调用入口层 · Clients</text>
+
+  <g>
+    <rect x="40" y="315" width="172" height="74" rx="7" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2" />
+    <text x="52" y="337" class="f-sans card-title">本地演示控制台</text>
+    <text x="52" y="355" class="f-mono card-code">FastAPI + SSE (:8085)</text>
+    <text x="52" y="374" class="f-sans card-desc">直接调用 :streamQuery</text>
+  </g>
+
+  <g>
+    <rect x="40" y="399" width="172" height="74" rx="7" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2" />
+    <text x="52" y="421" class="f-sans card-title">Gemini Enterprise</text>
+    <text x="52" y="439" class="f-mono card-code">Discovery Engine</text>
+    <text x="52" y="458" class="f-sans card-desc">企业统一对话入口 (global)</text>
+  </g>
+
+  <!-- Data Arrow: Clients -> Ingress GW -->
+  <line x1="224" y1="384" x2="306" y2="384" stroke="#0b57d0" stroke-width="2.2" marker-end="url(#arrowData)" />
+  <rect x="229" y="356" width="72" height="20" rx="4" fill="#ffffff" stroke="#bfdbfe" />
+  <text x="265" y="370" text-anchor="middle" class="f-mono edge-pill" fill="#0b57d0">:streamQuery</text>
+  <text x="265" y="401" text-anchor="middle" class="f-mono" font-size="9.5" fill="#64748b">HTTPS SSE</text>
+
+  <!-- Stage 2: Ingress Gateway (x = 310..514) -->
+  <g>
+    <rect x="310" y="282" width="204" height="204" rx="11" fill="#ffffff" stroke="#0b57d0" stroke-width="1.8" />
+    <rect x="311" y="283" width="202" height="29" rx="10" fill="#eff6ff" />
+    <rect x="311" y="300" width="202" height="12" fill="#eff6ff" />
+    <line x1="310" y1="312" x2="514" y2="312" stroke="#bfdbfe" />
+    <text x="324" y="301" class="f-sans zone-label" fill="#0b57d0">入向网关 · googleManaged</text>
+
+    <text x="324" y="336" class="f-mono card-title" font-size="14">ingress-gw</text>
+    <text x="324" y="354" class="f-mono" font-size="10" fill="#475569">CLIENT_TO_AGENT · us-central1</text>
+    <text x="324" y="372" class="f-sans card-desc">七层 Envoy 反向代理</text>
+
+    <rect x="322" y="386" width="180" height="86" rx="6" fill="#fffbeb" stroke="#fde68a" />
+    <text x="332" y="405" class="f-sans badge-text" fill="#b45309">挂载策略：Model Armor</text>
+    <text x="332" y="423" class="f-sans card-desc">· 拦截 GOD MODE 越狱提权</text>
+    <text x="332" y="440" class="f-sans card-desc">· 拦截恶意钓鱼申诉链接</text>
+    <text x="332" y="459" class="f-mono badge-text" fill="#b91c1c">违规直接返回 HTTP 403</text>
+  </g>
+
+  <!-- Data Arrow: Ingress GW -> Agent Runtime -->
+  <line x1="514" y1="384" x2="584" y2="384" stroke="#0b57d0" stroke-width="2.2" marker-end="url(#arrowData)" />
+  <text x="549" y="375" text-anchor="middle" class="f-sans edge-pill">合法请求</text>
+  <text x="549" y="401" text-anchor="middle" class="f-sans" font-size="10" fill="#64748b">唯一平台入口</text>
+
+  <!-- Stage 3: Agent Engine Runtime (x = 588..856) -->
+  <g>
+    <rect x="588" y="282" width="268" height="204" rx="11" fill="#ffffff" stroke="#0b57d0" stroke-width="2" />
+    <rect x="589" y="283" width="266" height="29" rx="10" fill="#0b57d0" />
+    <rect x="589" y="300" width="266" height="12" fill="#0b57d0" />
+    <text x="602" y="301" class="f-sans zone-label" fill="#ffffff">Vertex AI Agent Engine · us-central1</text>
+
+    <text x="602" y="336" class="f-mono card-title" font-size="13.5">game-liveops-orchestrator</text>
+    <text x="602" y="354" class="f-sans card-desc">ADK LlmAgent · 隔离沙箱 (切断公网直连)</text>
+
+    <!-- SPIFFE Identity Box -->
+    <rect x="600" y="366" width="244" height="58" rx="6" fill="#f8fafc" stroke="#cbd5e1" />
+    <text x="610" y="384" class="f-sans badge-text" fill="#0b57d0">SPIFFE Workload Identity (自动签发)</text>
+    <text x="610" y="401" class="f-mono" font-size="9.5" fill="#334155">principal://agents.global.org-&lt;ORG&gt;</text>
+    <text x="610" y="415" class="f-mono" font-size="9.5" fill="#334155">.system.id.goog/../reasoningEngines/&lt;ID&gt;</text>
+
+    <!-- Non-Streaming Note -->
+    <rect x="600" y="432" width="244" height="40" rx="6" fill="#f5f3ff" stroke="#ddd6fe" />
+    <text x="610" y="449" class="f-mono" font-size="10" font-weight="700" fill="#6d28d9">NonStreamingGemini (stream=False)</text>
+    <text x="610" y="464" class="f-sans" font-size="10" fill="#475569">内部固定走 :generateContent 确保 SGP 生效</text>
+  </g>
+
+  <!-- Data Arrow: Agent Runtime -> Egress GW -->
+  <line x1="856" y1="384" x2="958" y2="384" stroke="#0b57d0" stroke-width="2.2" marker-end="url(#arrowData)" />
+  <rect x="865" y="355" width="84" height="20" rx="4" fill="#ffffff" stroke="#bfdbfe" />
+  <text x="907" y="369" text-anchor="middle" class="f-mono edge-pill" fill="#0b57d0">PSC 强制引流</text>
+  <text x="907" y="401" text-anchor="middle" class="f-mono" font-size="9.5" fill="#64748b">SPIFFE mTLS</text>
+  <text x="907" y="414" text-anchor="middle" class="f-sans" font-size="9.5" fill="#64748b">物理防绕过</text>
+
+  <!-- Stage 4: Egress Gateway (x = 962..1252) -->
+  <g>
+    <rect x="962" y="282" width="290" height="204" rx="11" fill="#ffffff" stroke="#0b57d0" stroke-width="2" />
+    <rect x="963" y="283" width="288" height="29" rx="10" fill="#eff6ff" />
+    <rect x="963" y="300" width="288" height="12" fill="#eff6ff" />
+    <line x1="962" y1="312" x2="1252" y2="312" stroke="#bfdbfe" />
+    <text x="976" y="301" class="f-sans zone-label" fill="#0b57d0">出向网关 · googleManaged SWP</text>
+
+    <text x="976" y="335" class="f-mono card-title" font-size="14">liveops-egress-gw</text>
+    <text x="976" y="352" class="f-mono" font-size="10.5" fill="#475569">AGENT_TO_ANYWHERE + TLS Inspection</text>
+
+    <!-- 3 Policy Slots -->
+    <rect x="974" y="363" width="266" height="33" rx="5" fill="#f8fafc" stroke="#cbd5e1" />
+    <circle cx="986" cy="379.5" r="4" fill="#0b57d0" />
+    <text x="996" y="377" class="f-sans" font-size="11" font-weight="700" fill="#0f172a">1. IAM UAP + Cloud IAP</text>
+    <text x="996" y="390" class="f-sans" font-size="10" fill="#475569">校验 SPIFFE 身份与 Allow Tool List 白名单</text>
+
+    <rect x="974" y="402" width="266" height="33" rx="5" fill="#fffbeb" stroke="#fde68a" />
+    <circle cx="986" cy="418.5" r="4" fill="#b45309" />
+    <text x="996" y="416" class="f-sans" font-size="11" font-weight="700" fill="#0f172a">2. Model Armor (CONTENT_AUTHZ)</text>
+    <text x="996" y="429" class="f-sans" font-size="10" fill="#475569">出向 Prompt 兜底防注入 &amp; 响应 SDP 防隐私外泄</text>
+
+    <rect x="974" y="441" width="266" height="33" rx="5" fill="#f5f3ff" stroke="#ddd6fe" />
+    <circle cx="986" cy="457.5" r="4" fill="#6d28d9" />
+    <text x="996" y="455" class="f-sans" font-size="11" font-weight="700" fill="#0f172a">3. Semantic Governance (SGP)</text>
+    <text x="996" y="468" class="f-sans" font-size="10" fill="#475569">审查 tool_call 金额上限、故障事由与用户意图对齐</text>
+  </g>
+
+  <!-- =======================================================================
+       EGRESS 4-WAY DISTRIBUTION BUS (y = 486..554)
+       ======================================================================= -->
+  <line x1="1107" y1="486" x2="1107" y2="518" stroke="#0b57d0" stroke-width="2.2" />
+  <line x1="166" y1="518" x2="1126" y2="518" stroke="#0b57d0" stroke-width="2.2" />
+
+  <!-- Drop 1: Agent-to-Model (x = 166) -->
+  <line x1="166" y1="518" x2="166" y2="550" stroke="#0b57d0" stroke-width="2.2" marker-end="url(#arrowData)" />
+  <rect x="92" y="508" width="148" height="19" rx="4" fill="#ffffff" stroke="#bfdbfe" />
+  <text x="166" y="521" text-anchor="middle" class="f-mono edge-pill" fill="#0b57d0">1. Agent-to-Model</text>
+
+  <!-- Drop 2: Agent-to-MCP (x = 492) -->
+  <line x1="492" y1="518" x2="492" y2="550" stroke="#0b57d0" stroke-width="2.2" marker-end="url(#arrowData)" />
+  <rect x="404" y="508" width="176" height="19" rx="4" fill="#ffffff" stroke="#bfdbfe" />
+  <text x="492" y="521" text-anchor="middle" class="f-mono edge-pill" fill="#0b57d0">2. Agent-to-MCP (tools/call)</text>
+
+  <!-- Drop 3: Agent-to-Agent (x = 834) -->
+  <line x1="834" y1="518" x2="834" y2="550" stroke="#0b57d0" stroke-width="2.2" marker-end="url(#arrowData)" />
+  <rect x="742" y="508" width="184" height="19" rx="4" fill="#ffffff" stroke="#bfdbfe" />
+  <text x="834" y="521" text-anchor="middle" class="f-mono edge-pill" fill="#0b57d0">3. Agent-to-Agent (A2A RPC)</text>
+
+  <!-- Drop 4: Agent-to-Endpoint (x = 1126) -->
+  <line x1="1126" y1="518" x2="1126" y2="550" stroke="#0b57d0" stroke-width="2.2" marker-end="url(#arrowData)" />
+  <rect x="1040" y="508" width="172" height="19" rx="4" fill="#ffffff" stroke="#bfdbfe" />
+  <text x="1126" y="521" text-anchor="middle" class="f-mono edge-pill" fill="#0b57d0">4. Agent-to-Endpoint</text>
+
+  <!-- =======================================================================
+       TIER 3: DOWNSTREAM RUNTIMES & SERVICES (y = 554..766)
+       ======================================================================= -->
+
+  <!-- Downstream 1: Vertex AI Model (x = 28..304) -->
+  <g>
+    <rect x="28" y="554" width="276" height="210" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.4" />
+    <rect x="29" y="555" width="274" height="27" rx="9" fill="#f1f5f9" />
+    <rect x="29" y="572" width="274" height="10" fill="#f1f5f9" />
+    <line x1="28" y1="582" x2="304" y2="582" stroke="#e2e8f0" />
+    <text x="42" y="572" class="f-sans zone-label" fill="#334155">Vertex AI Global Endpoint (global)</text>
+
+    <rect x="42" y="596" width="248" height="96" rx="7" fill="#ecfdf5" stroke="#6ee7b7" />
+    <circle cx="56" cy="616" r="4" fill="#047857" />
+    <text x="66" y="620" class="f-mono card-title" fill="#065f46">gemini-3.8-flash</text>
+    <text x="56" y="641" class="f-mono" font-size="11" fill="#047857">POST :generateContent</text>
+    <text x="56" y="661" class="f-sans card-desc">归属 Essential GCP APIs 白名单</text>
+    <text x="56" y="678" class="f-sans card-desc">承载主控推理与 SRE A2A 故障研判</text>
+
+    <rect x="42" y="704" width="248" height="46" rx="6" fill="#fef2f2" stroke="#fca5a5" />
+    <circle cx="56" cy="722" r="3.5" fill="#b91c1c" />
+    <text x="66" y="726" class="f-sans badge-text" fill="#b91c1c">未授权第三方模型 / 影子 AI API</text>
+    <text x="66" y="742" class="f-sans" font-size="10.5" fill="#7f1d1d">默认拒绝 (HTTP 403)</text>
+  </g>
+
+  <!-- Downstream 2: Cloud Run MCP Server (x = 320..664) -->
+  <g>
+    <rect x="320" y="554" width="344" height="210" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.4" />
+    <rect x="321" y="555" width="342" height="27" rx="9" fill="#f1f5f9" />
+    <rect x="321" y="572" width="342" height="10" fill="#f1f5f9" />
+    <line x1="320" y1="582" x2="664" y2="582" stroke="#e2e8f0" />
+    <text x="334" y="572" class="f-sans zone-label" fill="#334155">Cloud Run (us-central1) · MCP Server</text>
+
+    <text x="334" y="603" class="f-mono card-title">game-liveops-mcp</text>
+    <text x="500" y="603" class="f-mono" font-size="10.5" fill="#64748b">Streamable HTTP /mcp</text>
+
+    <!-- Tool 1 -->
+    <rect x="334" y="614" width="316" height="42" rx="6" fill="#ecfdf5" stroke="#6ee7b7" />
+    <circle cx="346" cy="630" r="3.5" fill="#047857" />
+    <text x="356" y="634" class="f-mono" font-size="11.5" font-weight="700" fill="#0f172a">query_player_ticket</text>
+    <text x="536" y="634" class="f-sans badge-text" fill="#047857">ALLOW 白名单</text>
+    <text x="356" y="649" class="f-sans" font-size="10" fill="#475569">只读查单 · 受出向 Model Armor SDP 防隐私泄漏保护</text>
+
+    <!-- Tool 2 -->
+    <rect x="334" y="662" width="316" height="42" rx="6" fill="#f5f3ff" stroke="#c4b5fd" />
+    <circle cx="346" cy="678" r="3.5" fill="#047857" />
+    <text x="356" y="682" class="f-mono" font-size="11.5" font-weight="700" fill="#0f172a">grant_player_compensation</text>
+    <text x="554" y="682" class="f-sans badge-text" fill="#6d28d9">ALLOW + SGP</text>
+    <text x="356" y="697" class="f-sans" font-size="10" fill="#475569">发奖赔付 · 受 SGP ≤500 金币、故障事由与意图对齐管控</text>
+
+    <!-- Tool 3 -->
+    <rect x="334" y="710" width="316" height="42" rx="6" fill="#fef2f2" stroke="#fca5a5" />
+    <circle cx="346" cy="726" r="3.5" fill="#b91c1c" />
+    <text x="356" y="730" class="f-mono" font-size="11.5" font-weight="700" fill="#7f1d1d">ban_player_account</text>
+    <text x="546" y="730" class="f-sans badge-text" fill="#b91c1c">HTTP 403 拒绝</text>
+    <text x="356" y="745" class="f-sans" font-size="10" fill="#7f1d1d">虽已导入 Registry，但未列入 Allow Tool List 默认阻断</text>
+  </g>
+
+  <!-- Downstream 3: Cloud Run A2A Agents (x = 680..984) -->
+  <g>
+    <rect x="680" y="554" width="304" height="210" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.4" />
+    <rect x="681" y="555" width="302" height="27" rx="9" fill="#f1f5f9" />
+    <rect x="681" y="572" width="302" height="10" fill="#f1f5f9" />
+    <line x1="680" y1="582" x2="984" y2="582" stroke="#e2e8f0" />
+    <text x="694" y="572" class="f-sans zone-label" fill="#334155">Cloud Run (us-central1) · 跨部门 A2A</text>
+
+    <!-- SRE A2A -->
+    <rect x="694" y="596" width="276" height="74" rx="7" fill="#ecfdf5" stroke="#6ee7b7" />
+    <circle cx="708" cy="616" r="4" fill="#047857" />
+    <text x="718" y="620" class="f-mono" font-size="12" font-weight="700" fill="#0f172a">sre-incident-a2a-agent</text>
+    <text x="718" y="639" class="f-sans badge-text" fill="#047857">ALLOW · 已授权跨部门协同</text>
+    <text x="718" y="657" class="f-sans" font-size="10.5" fill="#475569">核实区服节点闪断故障 (A2A message/send)</text>
+
+    <!-- Billing A2A -->
+    <rect x="694" y="680" width="276" height="72" rx="7" fill="#fef2f2" stroke="#fca5a5" />
+    <circle cx="708" cy="700" r="4" fill="#b91c1c" />
+    <text x="718" y="704" class="f-mono" font-size="12" font-weight="700" fill="#7f1d1d">billing-refund-a2a-agent</text>
+    <text x="718" y="723" class="f-sans badge-text" fill="#b91c1c">HTTP 403 · 跨部门边界隔离</text>
+    <text x="718" y="741" class="f-sans" font-size="10.5" fill="#7f1d1d">禁止客服角色越权调用财务法币原路退费</text>
+  </g>
+
+  <!-- Downstream 4: External HTTPS Endpoints (x = 1000..1252) -->
+  <g>
+    <rect x="1000" y="554" width="252" height="210" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.4" />
+    <rect x="1001" y="555" width="250" height="27" rx="9" fill="#f1f5f9" />
+    <rect x="1001" y="572" width="250" height="10" fill="#f1f5f9" />
+    <line x1="1000" y1="582" x2="1252" y2="582" stroke="#e2e8f0" />
+    <text x="1014" y="572" class="f-sans zone-label" fill="#334155">外部网络与 SaaS 接口</text>
+
+    <!-- Discord Endpoint -->
+    <rect x="1014" y="596" width="224" height="74" rx="7" fill="#ecfdf5" stroke="#6ee7b7" />
+    <circle cx="1028" cy="616" r="4" fill="#047857" />
+    <text x="1038" y="620" class="f-sans" font-size="12" font-weight="700" fill="#0f172a">Discord 社区公告机器人</text>
+    <text x="1038" y="639" class="f-sans badge-text" fill="#047857">ALLOW · 已备案 Endpoint</text>
+    <text x="1038" y="657" class="f-sans" font-size="10.5" fill="#475569">推送区服故障恢复状态公告</text>
+
+    <!-- Unregistered External Domain -->
+    <rect x="1014" y="680" width="224" height="72" rx="7" fill="#fef2f2" stroke="#fca5a5" />
+    <circle cx="1028" cy="700" r="4" fill="#b91c1c" />
+    <text x="1038" y="704" class="f-sans" font-size="12" font-weight="700" fill="#7f1d1d">未备案第三方外部域名</text>
+    <text x="1038" y="723" class="f-sans badge-text" fill="#b91c1c">HTTP 403 · 防数据外发</text>
+    <text x="1038" y="741" class="f-sans" font-size="10.5" fill="#7f1d1d">阻断 example.org 等私自外联</text>
+  </g>
+</svg>
