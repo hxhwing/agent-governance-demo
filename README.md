@@ -328,7 +328,7 @@ flowchart LR
 - `docs/architecture.svg` — 高清矢量云端全景部署与治理拓扑图。
 - `agents/game_liveops_orchestrator/agent.py` — 主控客服协同 ADK Agent（`gemini-3.8-flash`，支持动态解析 Agent Registry 中的 MCP、A2A 与 Discord Webhook）。
 - `services/cloudrun_mcp_and_a2a/main.py` — Cloud Run 后端服务，按角色分别承载 `game-liveops-mcp`、`sre-incident-a2a-agent`（接入 Gemini 3.8 Flash 实时生成运维排障结论）与 `billing-refund-a2a-agent`。
-- `infra/` — 全套云端基础设施自动化创建、部署、网关策略挂载、IAM UAP 纯白名单配置及 Gemini Enterprise 注册脚本（`01` 至 `08`）。
+- `infra/` — 全套云端基础设施自动化创建、部署、网关策略挂载、IAM UAP 纯白名单配置、Gemini Enterprise 注册（`01` 至 `08`）及演示后一键资源清理脚本（`99_cleanup.sh`）。
 - `frontend/` — 交互式演示控制台 Web 前后端（支持同一 Agent Engine `Session` 多轮上下文记忆、新会话重置、Markdown 实时流式渲染、SGP 策略在线热切换及全链路拓扑高亮）。
 - `tests/verify_all_governance_scenarios.py` — 全量 **14 个演示场景** 端到端自动化验证脚本。
 
@@ -365,4 +365,8 @@ cp .env.example .env
 
 # 4. 运行全量 14 个治理场景端到端自动化测试
 ./.venv/bin/python tests/verify_all_governance_scenarios.py
+
+# 5. 演示结束后一键清理云端计费资源（按逆向依赖顺序释放 Agent Engine、双向 Gateway/SWP、Cloud Run 等）
+./infra/99_cleanup.sh                         # 交互式确认清理计算与网关实例（保留镜像仓库加速下次部署）
+# ./infra/99_cleanup.sh --yes --purge-storage # 免交互彻底清理（同时删除 Artifact Registry 与 GCS 临时桶）
 ```
