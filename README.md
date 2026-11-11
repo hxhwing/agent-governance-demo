@@ -1,10 +1,14 @@
-# Google Cloud Agent Security & Governance 端到端实时演示系统
+# Google Cloud Agent Security & Governance 端到端Demo
 **游戏客服与运营协同治理中心（Game LiveOps Customer Support & Security Governance Demo）**
+
+<p align="center">
+  <img src="docs/architecture.svg" alt="Google Cloud Agent Security &amp; Governance 端到端云端部署与治理架构图" width="100%" />
+</p>
 
 本项目基于真实的 Google Cloud 生产组件构建了一套完整的 **企业级 AI Agent 零信任安全与多层治理（Agent Security & Governance）** 端到端参考实现与可视化实时演示平台，完整覆盖：
 
 1. **Agent Identity（SPIFFE 零信任工作负载身份）**
-   - 在 Vertex AI Agent Engine (`us-central1`) 上自动为 Agent 签发不可伪造的 W3C / SPIFFE 身份凭证：
+   - 在 Gemini Agent Runtime (`us-central1`) 上自动为 Agent 签发不可伪造的 W3C / SPIFFE 身份凭证：
      `principal://agents.global.org-<ORG_ID>.system.id.goog/resources/aiplatform/projects/<PROJECT_NUMBER>/locations/<REGION>/reasoningEngines/<ENGINE_ID>`
 2. **Agent Registry（统一资产注册与发现中心）**
    - 集中登记并纳管企业内的 AI 资产（支持 `Agents`、`MCP Servers`、`Endpoints` 与 `Skills`）：
@@ -27,19 +31,13 @@
 
 ---
 
-## 🏗️ 系统全景部署与治理架构图
-
-下图展示本系统中**客户端入口、双向托管 Agent Gateway、主控 Agent Runtime、安全治理控制平面、大模型，以及下游 Cloud Run（MCP Server / Tools、跨部门 A2A Agents）与外部 Endpoint** 的云端部署位置与协议拓扑：
-
-<p align="center">
-  <img src="docs/architecture.svg" alt="Google Cloud Agent Security &amp; Governance 端到端云端部署与治理架构图" width="100%" />
-</p>
+## 🏗️ 组件部署清单与资产管控模型
 
 ### 全量组件部署位置与注册清单
 
 | 组件分类 | 组件 / 工具名称 | 部署位置 (Runtime) | 通信协议 | Agent Registry 状态 | 挂载的治理策略 |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **主控 Agent** | `game-liveops-orchestrator` | **Vertex AI Agent Engine** (`us-central1`) | ADK `:streamQuery` (SSE) | 自动发现 (`AGENT`) | 自动签发 SPIFFE 身份；绑定入向 `ingress-gw` 与出向 `liveops-egress-gw` |
+| **主控 Agent** | `game-liveops-orchestrator` | **Gemini Agent Runtime** (`us-central1`) | ADK `:streamQuery` (SSE) | 自动发现 (`AGENT`) | 自动签发 SPIFFE 身份；绑定入向 `ingress-gw` 与出向 `liveops-egress-gw` |
 | **入向网关** | `ingress-gw` | **Network Services `AgentGateway`** (`us-central1`, `googleManaged`) | HTTPS L7 Reverse Proxy | — | `AuthzPolicy` (`CONTENT_AUTHZ`) ➔ `Model Armor` |
 | **出向网关** | `liveops-egress-gw` | **Network Services `AgentGateway`** (`us-central1`, `googleManaged` + PSC) | HTTPS Forward Proxy + TLS Inspection | 关联 `Agent Registry` | `AuthzPolicy` (`REQUEST_AUTHZ` ➔ `Cloud IAP / IAM UAP`) + `Model Armor` |
 | **大模型** | `gemini-3.8-flash` | **Vertex AI Global Endpoint** (`location=global`) | Vertex AI `:generateContent` | 归属 `Essential GCP APIs` | `IAM UAP` Endpoint 白名单 |
@@ -104,7 +102,7 @@ flowchart LR
 
   Client["调用入口<br/>Web 控制台 / Gemini Enterprise"]:::entry
   IGW["入向网关 ingress-gw<br/>AuthzPolicy · RateLimit · Model Armor"]:::gw
-  Runtime["主控 Agent Runtime<br/>隔离沙箱 · SPIFFE 工作负载身份"]:::rt
+  Runtime["Gemini Agent Runtime<br/>隔离沙箱 · SPIFFE 工作负载身份"]:::rt
   EGW["出向网关 liveops-egress-gw<br/>IAM UAP · Model Armor · SGP"]:::gw
 
   M["Vertex AI Gemini<br/>:generateContent"]:::target
@@ -125,17 +123,17 @@ flowchart LR
 | :--- | :--- | :--- |
 | **保护对象** | 保护通往 **Agent** 或 **企业内部 MCP Server** 的入向连接 | 管控 **Agent 主动发起** 的一切出向连接（Model / MCP / A2A / 外部 SaaS） |
 | **代理本质** | **七层反向代理**（Reverse Proxy） | **七层正向代理**（Forward Proxy + HTTPS TLS 解密检查） |
-| **`googleManaged` 全托管模式**<br/>*(本 Demo 采用)* | Google 在托管租户项目中自动编排 Envoy 反向代理集群并串联在 Vertex AI Agent Engine 入口前 | Google 在托管租户项目中自动拉起托管 Secure Web Proxy (`SWP`) 集群，通过 PSC 接收并审查 Agent Engine 全部出站流量 |
+| **`googleManaged` 全托管模式**<br/>*(本 Demo 采用)* | Google 在托管租户项目中自动编排 Envoy 反向代理集群并串联在 Gemini Agent Runtime 入口前 | Google 在托管租户项目中自动拉起托管 Secure Web Proxy (`SWP`) 集群，通过 PSC 接收并审查 Gemini Agent Runtime 全部出站流量 |
 | **`selfManaged` 自管模式**<br/>*(适用于 Cloud Run / GKE 自建 Agent)* | 附着在客户自己 VPC 的 **Application Load Balancer (ALB)** 转发规则上，配合 Cloud Run `Internal + CLB` 锁死入口 | 附着在客户自己 VPC 的 **Secure Web Proxy (SWP)** 上，配合 Cloud Run `Direct VPC Egress` 与防火墙禁公网路由锁死出口 |
 
 ---
 
 ### 2. Agent 是如何与 Gateway 强绑定并实现「100% 物理防绕过」的？
 
-在 Vertex AI Agent Engine 托管模式下，开发者在业务代码（如 `agents/game_liveops_orchestrator/agent.py`）中只需编写最普通的 `requests.post("https://...")`，**无需配置任何代理地址，且即便恶意代码故意设置 `proxies={}` 也绝对无法绕过网关**：
+在 Gemini Agent Runtime 托管模式下，开发者在业务代码（如 `agents/game_liveops_orchestrator/agent.py`）中只需编写最普通的 `requests.post("https://...")`，**无需配置任何代理地址，且即便恶意代码故意设置 `proxies={}` 也绝对无法绕过网关**：
 
 1. **部署规格声明式绑定**：在创建 `ReasoningEngine` 时（见 `infra/06_deploy_orchestrator_runtime.py`），直接在底层实例规格 `spec.deploymentSpec.agentGatewayConfig` 绑定 `clientToAgentConfig`（`ingress-gw`）与 `agentToAnywhereConfig`（`liveops-egress-gw`）。
-2. **入向唯一入口**：Agent Engine 容器运行在隔离沙箱内，不暴露任何直连容器 IP，所有 `:query` / `:streamQuery` 流量在平台侧必经 `ingress-gw`。
+2. **入向唯一入口**：Gemini Agent Runtime 容器运行在隔离沙箱内，不暴露任何直连容器 IP，所有 `:query` / `:streamQuery` 流量在平台侧必经 `ingress-gw`。
 3. **出向三步透明劫持（基于 `agentGatewayCard` 机制）**：
    - **网络黑洞 + PSC 强制引流**：沙箱容器默认切断直接公网路由，宿主机底层通过 Private Service Connect（`mtlsEndpoint`）将所有出向流量透明引流至 `liveops-egress-gw`；
    - **宿主机自动签发 SPIFFE mTLS 证书**：连接建立时由宿主机使用该实例专属的 `AGENT_IDENTITY` X.509 证书与出口网关完成双向 mTLS 握手，确保网关 IAP 100% 识别真实调用身份，无法伪造或匿名；
@@ -191,14 +189,14 @@ flowchart LR
 
 ## 🎮 演示场景与测试 Prompt 清单（支持 Gemini Enterprise 与本地控制台直接测试）
 
-部署并注册完成后，以下 **14 个端到端治理测试场景**既可在本地可视化控制台（`http://127.0.0.1:8085`）点击触发，也可**直接复制下方代码块中的 Prompt 到 Gemini Enterprise（选择 `@Game LiveOps Governance Orchestrator`）中进行实测**，两者经过完全相同的云端 `ingress-gw` ➔ `Agent Engine` ➔ `liveops-egress-gw` 治理链路。
+部署并注册完成后，以下 **14 个端到端治理测试场景**既可在本地可视化控制台（`http://127.0.0.1:8085`）点击触发，也可**直接复制下方代码块中的 Prompt 到 Gemini Enterprise（选择 `@Game LiveOps Governance Orchestrator`）中进行实测**，两者经过完全相同的云端 `ingress-gw` ➔ `Gemini Agent Runtime` ➔ `liveops-egress-gw` 治理链路。
 
 ---
 
 ### 一、身份与资产盘点 · Identity & Registry（1 个场景）
 
 #### 1. 盘点 SPIFFE 身份与已注册服务（`🟢 ALLOW`）
-- **验证能力**：读取 Agent Engine 运行时内置环境与 SPIFFE 身份，并动态查询 `Agent Registry` 中纳管的 Agents、MCP Server 与外部备案 Endpoints。
+- **验证能力**：读取 Gemini Agent Runtime 运行时内置环境与 SPIFFE 身份，并动态查询 `Agent Registry` 中纳管的 Agents、MCP Server 与外部备案 Endpoints。
 - **测试 Prompt**：
   ```text
   请做一次 LiveOps 治理状态检查，看看目前接入了哪些服务。
@@ -329,7 +327,7 @@ flowchart LR
 - `agents/game_liveops_orchestrator/agent.py` — 主控客服协同 ADK Agent（`gemini-3.8-flash`，支持动态解析 Agent Registry 中的 MCP、A2A 与 Discord Webhook）。
 - `services/cloudrun_mcp_and_a2a/main.py` — Cloud Run 后端服务，按角色分别承载 `game-liveops-mcp`、`sre-incident-a2a-agent`（接入 Gemini 3.8 Flash 实时生成运维排障结论）与 `billing-refund-a2a-agent`。
 - `infra/` — 全套云端基础设施自动化创建、部署、网关策略挂载、IAM UAP 纯白名单配置、Gemini Enterprise 注册（`01` 至 `08`）及演示后一键资源清理脚本（`99_cleanup.sh`）。
-- `frontend/` — 交互式演示控制台 Web 前后端（支持同一 Agent Engine `Session` 多轮上下文记忆、新会话重置、Markdown 实时流式渲染、SGP 策略在线热切换及全链路拓扑高亮）。
+- `frontend/` — 交互式演示控制台 Web 前后端（支持同一 Gemini Agent Runtime `Session` 多轮上下文记忆、新会话重置、Markdown 实时流式渲染、SGP 策略在线热切换及全链路拓扑高亮）。
 - `tests/verify_all_governance_scenarios.py` — 全量 **14 个演示场景** 端到端自动化验证脚本。
 
 ---
@@ -337,7 +335,7 @@ flowchart LR
 ## 🚀 环境配置、云端一键部署与本地演示启动
 
 项目中**不包含任何硬编码的项目 ID、组织号或服务 URL**：
-- **Agent Runtime 自动发现**：`agents/game_liveops_orchestrator/agent.py` 在运行期自动读取 Vertex AI Agent Engine 内置环境变量（`GOOGLE_CLOUD_PROJECT`、`GOOGLE_CLOUD_LOCATION`、`GOOGLE_CLOUD_AGENT_ENGINE_ID`）与 GCP Metadata Server 元数据，并从 `Agent Registry` 动态解析下游 MCP、A2A 与 Webhook 地址；
+- **Gemini Agent Runtime 自动发现**：`agents/game_liveops_orchestrator/agent.py` 在运行期自动读取 Gemini Agent Runtime 内置环境变量（`GOOGLE_CLOUD_PROJECT`、`GOOGLE_CLOUD_LOCATION`、`GOOGLE_CLOUD_AGENT_ENGINE_ID`）与 GCP Metadata Server 元数据，并从 `Agent Registry` 动态解析下游 MCP、A2A 与 Webhook 地址；
 - **部署脚本环境变量驱动**：`infra/` 下所有部署脚本统一通过 `infra/_config.sh` 或环境变量读取配置（优先级：`Shell export 环境变量 > .env 文件 > gcloud CLI 自动检测`）。
 
 ```bash
@@ -355,7 +353,7 @@ cp .env.example .env
 ./infra/03_deploy_cloudrun_backends.sh        # 部署 MCP / SRE A2A / Billing A2A 并注册至 Agent Registry
 ./infra/04_setup_registry_and_iam_uap.sh      # 注册外部备案 Webhook Endpoint 至 Agent Registry
 ./infra/05_configure_gateways.sh enforce      # 在双向 Agent Gateway 挂载 Model Armor 与 Cloud IAP 策略
-./.venv/bin/python infra/06_deploy_orchestrator_runtime.py  # 部署主控 Agent 至 Agent Engine 并绑定双向网关
+./.venv/bin/python infra/06_deploy_orchestrator_runtime.py  # 部署主控 Agent 至 Gemini Agent Runtime 并绑定双向网关
 ./infra/07_create_sgp_policy.sh               # 配置 IAM v3beta UAP 纯白名单策略 (Allow Tool List)
 # 可选：若需接入 Gemini Enterprise，配置 GEMINI_ENTERPRISE_APP_ID 后执行：
 # ./infra/08_register_gemini_enterprise.sh
@@ -366,7 +364,7 @@ cp .env.example .env
 # 4. 运行全量 14 个治理场景端到端自动化测试
 ./.venv/bin/python tests/verify_all_governance_scenarios.py
 
-# 5. 演示结束后一键清理云端计费资源（按逆向依赖顺序释放 Agent Engine、双向 Gateway/SWP、Cloud Run 等）
+# 5. 演示结束后一键清理云端计费资源（按逆向依赖顺序释放 Gemini Agent Runtime、双向 Gateway/SWP、Cloud Run 等）
 ./infra/99_cleanup.sh                         # 交互式确认清理计算与网关实例（保留镜像仓库加速下次部署）
 # ./infra/99_cleanup.sh --yes --purge-storage # 免交互彻底清理（同时删除 Artifact Registry 与 GCS 临时桶）
 ```

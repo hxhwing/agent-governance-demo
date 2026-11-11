@@ -203,12 +203,12 @@
   <text x="549" y="375" text-anchor="middle" class="f-sans edge-pill">合法请求</text>
   <text x="549" y="401" text-anchor="middle" class="f-sans" font-size="10" fill="#64748b">唯一平台入口</text>
 
-  <!-- Stage 3: Agent Engine Runtime (x = 588..856) -->
+  <!-- Stage 3: Gemini Agent Runtime (x = 588..856) -->
   <g>
     <rect x="588" y="282" width="268" height="204" rx="11" fill="#ffffff" stroke="#0b57d0" stroke-width="2" />
     <rect x="589" y="283" width="266" height="29" rx="10" fill="#0b57d0" />
     <rect x="589" y="300" width="266" height="12" fill="#0b57d0" />
-    <text x="602" y="301" class="f-sans zone-label" fill="#ffffff">Vertex AI Agent Engine · us-central1</text>
+    <text x="602" y="301" class="f-sans zone-label" fill="#ffffff">Gemini Agent Runtime · us-central1</text>
 
     <text x="602" y="336" class="f-mono card-title" font-size="13.5">game-liveops-orchestrator</text>
     <text x="602" y="354" class="f-sans card-desc">ADK LlmAgent · 隔离沙箱 (切断公网直连)</text>

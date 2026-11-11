@@ -121,7 +121,7 @@ def main() -> None:
     ingress_gw_res = f"projects/{PROJECT_ID}/locations/{REGION}/agentGateways/{INGRESS_GATEWAY_NAME}"
     egress_gw_res = f"projects/{PROJECT_ID}/locations/{REGION}/agentGateways/{EGRESS_GATEWAY_NAME}"
 
-    # Note: Vertex AI Agent Engine automatically injects GOOGLE_CLOUD_PROJECT, GOOGLE_CLOUD_LOCATION,
+    # Note: Gemini Agent Runtime automatically injects GOOGLE_CLOUD_PROJECT, GOOGLE_CLOUD_LOCATION,
     # and GOOGLE_CLOUD_AGENT_ENGINE_ID at container runtime, and agent.py reads projectNumber from GCP Metadata Server.
     runtime_env_vars: dict[str, str] = {
         "MODEL_LOCATION": MODEL_LOCATION,

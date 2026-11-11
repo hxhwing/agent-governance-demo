@@ -147,7 +147,7 @@ function updateSessionPill(sessionId) {
   if (!pill) return;
   if (sessionId) {
     pill.textContent = `Session #${sessionId.slice(-6)}`;
-    pill.title = `当前多轮对话共享同一个 Agent Engine Session ID: ${sessionId}（User: ${sessionUserId}）`;
+    pill.title = `当前多轮对话共享同一个 Gemini Agent Runtime Session ID: ${sessionId}（User: ${sessionUserId}）`;
   } else {
     pill.textContent = `Session (${sessionUserId})`;
     pill.title = `当前会话用户: ${sessionUserId}`;
@@ -168,7 +168,7 @@ async function initEngineSession() {
       updateSessionPill(currentEngineSessionId);
     }
   } catch (err) {
-    console.error("Failed to create Agent Engine session:", err);
+    console.error("Failed to create Gemini Agent Runtime session:", err);
     updateSessionPill("");
   }
 }

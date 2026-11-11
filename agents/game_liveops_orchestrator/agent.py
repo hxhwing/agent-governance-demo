@@ -15,7 +15,7 @@ from google.genai import Client
 
 
 def _query_gcp_metadata(path: str) -> str:
-    """Read project/instance attributes from GCP Metadata Server when running in Agent Engine / Cloud Run."""
+    """Read project/instance attributes from GCP Metadata Server when running in Gemini Agent Runtime / Cloud Run."""
     try:
         resp = requests.get(
             f"http://metadata.google.internal/computeMetadata/v1/{path.lstrip('/')}",
@@ -33,10 +33,10 @@ _RUNTIME_ENV_CACHE: Dict[str, str] = {}
 
 
 def _get_runtime_env() -> Dict[str, str]:
-    """Resolve runtime project, location, and engine identity from Vertex AI Agent Engine default env vars + Metadata Server."""
+    """Resolve runtime project, location, and engine identity from Gemini Agent Runtime default env vars + Metadata Server."""
     if _RUNTIME_ENV_CACHE:
         return _RUNTIME_ENV_CACHE
-    # Vertex AI Agent Engine automatically injects GOOGLE_CLOUD_PROJECT, GOOGLE_CLOUD_LOCATION, GOOGLE_CLOUD_AGENT_ENGINE_ID
+    # Gemini Agent Runtime automatically injects GOOGLE_CLOUD_PROJECT, GOOGLE_CLOUD_LOCATION, GOOGLE_CLOUD_AGENT_ENGINE_ID
     project_id = (
         os.environ.get("GOOGLE_CLOUD_PROJECT")
         or os.environ.get("PROJECT_ID")

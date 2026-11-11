@@ -4,7 +4,7 @@
 # Deletes billable compute/gateway resources in strict reverse dependency order:
 #   1. Gemini Enterprise agent registration (if configured)
 #   2. Semantic Governance Policies & SGP Engine gateway detachment
-#   3. Vertex AI Agent Engine runtime (ReasoningEngine)
+#   3. Gemini Agent Runtime (ReasoningEngine)
 #   4. Network Security AuthzPolicies & Network Services AuthzExtensions
 #   5. Ingress & Egress Agent Gateways (managed Envoy / SWP instances)
 #   6. AgentConnectivityTemplate, PSC Network Attachment & Private Cloud DNS Zone
@@ -169,10 +169,10 @@ curl -s -X PATCH \
   -d '{"gatewayConfigs": {}}' >/dev/null 2>&1 || true
 
 # ------------------------------------------------------------------------------
-# 3. Vertex AI Agent Engine Runtime (ReasoningEngine — Major Hourly Cost)
+# 3. Gemini Agent Runtime (ReasoningEngine — Major Hourly Cost)
 # ------------------------------------------------------------------------------
 echo ""
-echo "=== 3. Deleting Vertex AI Agent Engine Runtime (game-liveops-orchestrator) ==="
+echo "=== 3. Deleting Gemini Agent Runtime (game-liveops-orchestrator) ==="
 ENGINE_IDS=()
 if [[ -n "${ORCHESTRATOR_ENGINE_ID:-}" ]]; then
   ENGINE_IDS+=("${ORCHESTRATOR_ENGINE_ID}")
